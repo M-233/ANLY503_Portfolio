@@ -77,12 +77,12 @@ mdf4 = mdf4[,c("source","target","count")]
 Row
 ---------------------------------------
 
-### Solution 7
+### Migrations Network of New York, Texas, California and Arizona {data-height=700}
 
-```{r fig.height=10, fig.width=10,warning=FALSE}
+```{r warning=FALSE}
 
 circos.clear()
 chordDiagram(mdf4,  annotationTrack = c("name", "grid"),
              annotationTrackHeight = c(0.03, 0.01),transparency = 0.1,big.gap = 1)
-title("Migrations Network of \n New York, Texas, California and 		Arizona", cex = 0.8)
+#title("Migrations Network of \n New York, Texas, California and 		Arizona", cex = 0.8)
 ```
