@@ -1,9 +1,31 @@
-name: "my-website"
+name: "ANLY503_Portfolio"
 output_dir: "docs"
 navbar:
-  title: "My Website"
+  title: "ANLY503-Portfolio"
   left:
     - text: "Home"
       href: index.html
-    - text: "About"
-      href: about.html
+    - text: "A1"
+      href: A1.html
+    - text: "A2"
+      href: A2.html
+    - text: "A3"
+      href: A3.html
+    - text: "A4"
+      href: A4.html
+    - text: "A5"
+      href: A5.html
+    - text: "A6"
+      href: A6.html
+    - text: "A7"
+      href: A7.html
+    - text: "Project"
+      href: Project.html
+      
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
+
+      

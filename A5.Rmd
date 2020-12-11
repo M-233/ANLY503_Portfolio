@@ -1,0 +1,307 @@
+---
+title: "A5"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Assignment 5
+
+Use the data provided in the files above to create analysis and visualizations that answer the posed question or complete the task.
+
+1. Explore all accounts. Create visualizations that combine or these account characteristics:
+* Whether an account has a credit card or not
+* Whether an account has a loan or not
+* The average balance for the account
+
+2. What is the distribution of all loans and what are their characteristics?
+
+3. Is there a relationship between a good or bad loan and the time between an account is opened an the loan is created? Is there a specific set of accounts that seem to be at higher or lower risk of defaulting?
+
+4. For the account with the highest number of transactions, make a time series line plot for the behavior of the account over time, including all debits and credits, the different methods, and the with the different categories.
+
+5. Explore the validity of the data for the case whether or not an account has a credit card and whether or not they have associated credit card transactions. Is there anything worth noting?
+
+```{r include=FALSE}
+library(readr)   # Data ingestion
+library(tidyr)   # Data reshaping
+library(dplyr)   # Data manipulation
+library(ggplot2) # Graphs
+require(downloader)  
+library(dplyr)
+library(sqldf)
+library(reshape)
+library(stringr)
+library(tidyverse)
+library(magrittr)
+```
+```{r include=FALSE}
+#load data
+acc=read.csv("data/A5/accounts_analytical.csv")
+tra=read.csv("data/A5/transactions.csv")
+```
+
+
+
+
+Row 
+-------------------------------------
+
+### Solution 5.1
+
+From plots below, we can see that most accounts do not have loan ot credit cards. Besides, the distribution of average balance. Most balance lies on the range of 20000 to 40000.
+
+Moreover,there is little difference on the distribution between acounts that has or do not have credit cards. While for the accounts who have loans, the average balance is bigger.
+
+```{r}
+# clean data
+acc1=sqldf("select account_id, credit_cards,loan_amount from acc")
+acc1[is.na(acc1)]<- 0
+acc1=sqldf("select *, (case credit_cards when 0 then 'F' else 'T' end) as HaveCredit,(case loan_amount when 0 then 'F' else 'T' end) as HaveLoan from acc1")
+#head(acc1)
+```
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Chart 5.1.1
+
+```{r}
+ggplot(data = acc1) + 
+    geom_bar(mapping = aes(x = HaveCredit))+
+  labs(x = 'Have credit cards or not', 
+       y = 'count')
+```
+
+
+### Chart 5.1.2
+
+```{r}
+ggplot(data = acc1) + 
+    geom_bar(mapping = aes(x = HaveLoan))+
+  labs(x = 'Have loan or not', 
+       y = 'count')
+```
+
+
+### Chart 5.1.3
+
+```{r}
+avgba=sqldf("select account_id,avg(balance) as avgbalance from tra group by account_id")
+t1=left_join(acc1, avgba, by = "account_id")
+ggplot(data = t1) + geom_histogram(mapping = aes(x = avgbalance))+
+  labs(x = 'Average balance', 
+       y = 'count')
+```
+
+### Chart 5.1.4
+
+```{r}
+ggplot(data = t1, mapping = aes(x=HaveCredit, y=avgbalance)) + geom_boxplot()
+ggplot(data = t1, mapping = aes(x=HaveLoan, y=avgbalance)) + geom_boxplot()
+```
+
+
+Row 
+-------------------------------------
+
+### Solution 5.2
+
+From plots below, the higher the loan amount, the higher the risk of loan becoming default. Also, the larger the loan amount, the longer the loan term in general.
+
+We can also conclude that the higher the loan payment, the higher the risk of loan becoming default. This is somehow consitent to the loan amount vs default loan relationship. However, there is no much difference on loan payment among different loan term.
+
+
+```{r}
+loan=sqldf("select loan_date,loan_amount,loan_payment,loan_term,loan_status,loan_default from acc")
+loan=drop_na(loan)
+loan$loan_date=as.Date(loan$loan_date,format='%Y-%m-%d')
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Chart 5.2.1
+
+```{r}
+ggplot(data = loan) + geom_histogram(mapping = aes(x = loan_amount),color="orange")+
+  labs(x = 'Loan Amount', 
+       y = 'Count',title='Distribution of Loan Amount')
+```
+
+
+### Chart 5.2.2
+
+```{r}
+ggplot(data = loan, mapping = aes(x=loan_default, y=loan_amount)) + geom_boxplot(mapping = aes(color = loan_default))+
+  labs(y = 'Loan Amount', 
+       x = 'Loan Default Type',title='Distribution of Loan Amount by Loan Default Type')
+
+
+```
+
+
+### Chart 5.2.3
+
+```{r}
+ggplot(data = loan, mapping = aes(x=as.factor(loan_term), y=loan_amount)) + geom_boxplot(mapping = aes(color = loan_term))+
+  labs(x = 'Loan Term', 
+       y = 'Loan Amount',title='Distribution of Loan Amount versus other Loan Term')
+```
+
+### Chart 5.2.4
+
+```{r}
+ggplot(data = loan) + geom_histogram(mapping = aes(x = loan_payment),color=2,binwidth=500)+
+  labs(x = 'Loan Payment', 
+       y = 'Count',title='Distribution of Loan Payment')
+```
+
+### Chart 5.2.5
+
+```{r}
+ggplot(data = loan, mapping = aes(x=loan_default, y=loan_payment)) + geom_boxplot(mapping = aes(color = loan_default))+
+  labs(y = 'Loan Payment', 
+       x = 'Loan Default Type',title='Distribution of Loan Payment by Loan Default Type')
+
+```
+
+### Chart 5.2.6
+```{r}
+ggplot(data = loan, mapping = aes(x=as.factor(loan_term), y=loan_payment)) + geom_boxplot(mapping = aes(color = loan_term))+
+  labs(x = 'Loan Term', 
+       y = 'Loan Payment',title='Distribution of Loan Payment versus other Loan Term')
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 5.3
+
+From density histogram of timediff versus loan_default. We could see if someone lend a loan shortly after he opens an acount, it is more likelt that the loan is default.
+
+
+From correlation plot, the default loan tends to have low min_withdrawal, low max_balance and low_min balance.
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+
+```{r}
+t3=sqldf("select account_id,acct_creation_date,loan_date,loan_amount,loan_payment,loan_term,loan_status,loan_default from acc")
+t3=drop_na(t3)
+#the time between an account is opened an the loan is created
+t3$loan_date=as.Date(t3$loan_date,format='%Y-%m-%d')
+t3$acct_creation_date=as.Date(t3$acct_creation_date,format='%Y-%m-%d')
+t3$datediff=t3$loan_date-t3$acct_creation_date
+```
+
+### Chart 5.3.1
+
+```{r}
+ggplot(data=t3,aes(x=datediff,..density..,fill=loan_default))+geom_histogram(alpha=0.4,position = "identity",binwidth=25)+geom_line(stat='density',mapping = aes(color = loan_default),size=1.5)+
+  labs(x = 'Time between an account is opened an the loan is created', 
+       y = 'Loan Default type',title='Relationship between Datediff and Good or Bad Loan')
+```
+
+
+### Chart 5.3.2
+
+```{r include=FALSE}
+library(GGally)
+t3_2=sqldf("select account_id,loan_amount,loan_payment,loan_term,loan_default from t3")
+acc2=sqldf("select account_id,max_withdrawal,min_withdrawal,max_balance,min_balance,pmt_order_ct,pmt_order_avg_amt from acc")
+t3_2_2=left_join(t3_2,acc2,by = "account_id")
+```
+
+```{r}
+ggpairs(t3_2_2,columns=2:4, aes(color=loan_default))
+```
+
+### Chart 5.3.3
+
+```{r}
+ggpairs(t3_2_2,columns=6:8, aes(color=loan_default))
+```
+
+
+### Chart 5.3.4
+
+```{r}
+ggpairs(t3_2_2,columns=9:11, aes(color=loan_default))
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 5.4
+
+From transcation amount time series plot by payment method plot, the overall trend is quite the same with th peak amount of debit is always lower that the credit and remain at low level during September to February next year. Similarily, the overall trend is quite the same with the peak amount of cash is generally lower that the bank transfer and remain at low level during September to February next year. However, the amount by differen categories remain at a stable level.
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+```{r}
+t4=sqldf("select * from tra where account_id=8261")
+t4$date=as.Date(t4$date,format='%Y-%m-%d')
+```
+
+
+### Chart 5.4.1
+```{r}
+ggplot(subset(t4, date>as.Date("1998-1-1")), aes(x=date, y=amount,fill=type)) +geom_line(mapping = aes(color = type)) +
+  labs(title='Transcation Amount By Payment Type')
+```
+
+
+### Chart 5.4.2
+```{r}
+ggplot(subset(t4, date>as.Date("1998-1-1")), aes(x=date, y=amount,fill=method)) +geom_line(mapping = aes(color = method), size = 1) + 
+  labs(title='Transcation Amount By Payment Method')
+```
+
+
+### Chart 5.4.3
+
+```{r}
+ggplot(subset(t4, date>as.Date("1998-1-1")), aes(x=date, y=amount,fill=category)) +geom_line(mapping = aes(color = category), size = 1) +
+  labs(title='Transcation Amount By Category')
+```
+
+Row
+-----------------------------------------------------------------------
+
+
+### Solution 5.5
+
+From the plot, we can see that there are credit transactions even for those who do not have credit cards, and these records are large. This may be because that some people do transactions with credit cards from other banks.
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+```{r include=FALSE}
+t5_tra=sqldf("select account_id, sum(amount)as sum,type from tra where type='credit' group by account_id")
+t5_acc=sqldf("select account_id, credit_cards from acc")
+t5_acc[is.na(t5_acc)]<- 0
+t5=merge(t5_tra, t5_acc, by = "account_id")
+t5_2=sqldf("select *, (case credit_cards when 0 then 'F' else 'T' end) as HaveCredit from t5")
+
+```
+
+
+### Chart 5.5
+```{r}
+ggplot(data=t5_2,aes(x=sum,fill=HaveCredit))+geom_histogram(alpha=0.4,position = "identity")+
+  labs(x="Total Amount",title='Account Amount Distribution By Credit Cards')
+```
+
+

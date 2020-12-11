@@ -1,0 +1,45 @@
+---
+title: "A1"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll 
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Row
+-------------------------------
+
+### Assignment 1
+
+Open and explore your dataset and draw 3 conceptual data visualizations to describe different aspects of the data set, stating in each case the question you want to address with the visualization. These should be hand drawings, but with enough detail (labels, shading, etc) to make the visualization clear to the reader.
+
+Row
+-------------------------------
+
+
+
+
+```{r include=FALSE}
+library(tidyr)
+library(dplyr)
+a1=read.csv("data/clinical_data_breast_cancer_modified.csv", stringsAsFactors = F)
+```
+
+```{r eval=FALSE, include=FALSE}
+DT::datatable(a1, options = list(
+  pageLength = 5,bPaginate = FALSE
+))
+```
+
+
+
+### Solution 1 {data-width=1000}
+
+```{r}
+knitr::include_graphics("img/a1.png")
+```
+

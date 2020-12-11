@@ -1,0 +1,194 @@
+---
+title: "A4"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Assignment 4
+
+A bank stores data about their clients, the accounts (transactions within several months), the loans already granted, the credit cards issued. The bank managers hope to improve their understanding of customers and seek specific actions to improve services.
+
+1. Make the loans.csv data tidy. You must account for all the information contained in each record (row) and that should be in their own field. Remember, for a dataset to be considered tidy, it must meet the following criteria:
+
+* Each variable must have its own column
+* Each observation must have its own row
+* Each type of observational unit forms a table
+
+2. Make the district.csv data tidy. You must account for all the information contained in each record (row).
+
+3. Build an analytical dataset by combining (joining) the data from the different tables as you see fit, which will be used for the purposes of exploratory data analysis, visualization and reporting. The unit of analysis is the account.
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 4.1
+
+```{r include=FALSE}
+require(downloader)  
+library(dplyr)
+library(sqldf)
+library(reshape)
+library(stringr)
+```
+```{r eval=FALSE, include=FALSE}
+loans<-read.csv("data/A4/loans.csv")
+loans$date=as.Date(loans$date,format='%Y-%m-%d') 
+loans$account_id=as.factor(loans$account_id)
+loans$id=as.factor(loans$id)
+
+test=sqldf("select id, X24_A,X12_B,X12_A,X60_D,X48_C,X36_D,X36_C,X12_C,X48_A,X24_C,X60_C,X24_B,X48_D,X24_D,X48_B,X36_A,X36_B,X60_B,X12_D,X60_A from loans")
+test2=melt(test, id = c("id"))
+#which(test2[,3]=="X")
+type=subset(test2,(test2[,3]=="X"))
+type=subset(type,select = -c(value))
+
+type$loanduration=str_sub(type$variable,2,3)
+type$loantype=str_sub(type$variable,5,6)
+type$loanduration=as.numeric(type$loanduration)
+type$loantype=as.factor(type$loantype)
+type=subset(type,select = -c(variable))
+
+loans=subset(loans,select=c(id,account_id,date,amount,payments))
+newloans=sqldf("select * from loans as l
+inner join type as t
+on t.id=l.id" 
+)
+
+newloans=subset(newloans,select=-c(id))
+write.csv(newloans,file="data/A4/loans_r.csv",row.names = FALSE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+newloans=read.csv("data/A4/loans_r.csv")
+library(DT)
+DT::datatable(newloans, options = list(
+  pageLength = 5
+))
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 4.2
+
+```{r eval=FALSE, include=FALSE}
+library(dplyr)
+library(sqldf)
+library(reshape)
+library(stringr)
+library(tidyr)
+
+district = read.csv("data/A4/districts.csv",encoding="UTF-8")
+
+fctr.cols = c("municipality_info ", "unemployment_rate","commited_crimes")
+
+district$municipality_info = gsub("\\[|\\]", "",as.character(district$municipality_info))
+
+district$unemployment_rate = gsub("\\[|\\]", "", as.character(district$unemployment_rate))
+
+district$commited_crimes = gsub("\\[|\\]", "", as.character(district$commited_crimes))
+
+district <- district %>% group_by(id) %>% 
+  ungroup()  %>%
+  separate(municipality_info,sep = ",",paste0("population",c("<500","500-1999","2000-9999",">=10000")))   %>%
+  separate(unemployment_rate,sep = ",", paste0("unemployment rate of",c('1995','1996'))) %>% 
+  separate(commited_crimes, sep = ",",paste0("commited crimes of",c('1995','1996')))
+
+write.csv(district,"data/A4/district_r.csv")
+```
+
+```{r echo=FALSE, warning=FALSE}
+district=read.csv("data/A4/district_r.csv")
+DT::datatable(district, options = list(
+  pageLength = 5
+))
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 4.3
+
+```{r eval=FALSE, include=FALSE}
+acc=read.csv("data/A4/accounts.csv")
+dis<-read.csv("data/A4/districts.csv")
+selectdis=subset(dis,select=c(id,name))
+
+#account+district
+new1=sqldf("select * from acc as a inner join selectdis as b on a.district_id=b.id")
+new1=subset(new1,select=-c(district_id))
+new1=subset(new1,select=-c(id.1))
+colnames(new1)<-c("account_id","open_date","statement_frequency","district_name")
+
+links=read.csv("data/A4/links.csv")
+num_links=sqldf("select count(id),account_id from links group by account_id")
+#account+district+links
+new2=merge(new1, num_links, by = "account_id", all = F)
+colnames(new2)=c("account_id","open_date","statement_frequency","district_name","num_customers")
+
+#account+district+links+cards
+credit=read.csv("data/A4/cards.csv")
+num_credit=sqldf("select count(id),link_id from credit group by link_id")
+colnames(num_credit)[-1]="account_id"
+
+new3=left_join(new2, num_credit, by = "account_id")
+new3[is.na(new3)] <- 0
+colnames(new3)<-c("account_id","open_date","statement_frequency","district_name","num_customers","credit_cards")
+
+#+loans
+loan=read.csv("data/A4/loans_r.csv")
+new4=left_join(new3, loan, by = "account_id")
+loan_2=sqldf("select account_id, (case loantype 
+                       when 'A' then 'expired'
+                       when 'B' then 'expired'
+                       when 'C' then 'current'
+                       when 'D' then 'current' 
+                       else null end) as loan_status,
+                  (case loantype 
+                       when 'A' then 'F'
+                       when 'B' then 'F'
+                       when 'C' then 'F'
+                       when 'D' then 'T' 
+                       else null end) as loan_default from new4")
+new42=left_join(new4, loan_2, by = "account_id")
+loantf=subset(loan_2,select=-(loan_status))
+loantf[is.na(loantf)]<-0
+loantf=sqldf("select account_id,(case loan_default when '0' then 'F' else 'T' end) as loan from loantf")
+new42=left_join(new42, loantf, by = "account_id")
+new42=subset(new42,select=-c(date,id,loantype))
+colnames(new42)<-c("account_id","open_date","statement_frequency","district_name","num_customers","credit_cards","loan_amount","loan_payments","loan_term","loan_status","loan_default","loan")
+
+#+payment_orders
+po=read.csv("data/A4/payment_orders.csv")
+pomn=sqldf("select max(amount),min(amount),account_id from po group by account_id")
+colnames(pomn)=c("max_withdrawal","min_withdrawal","account_id")
+new5=left_join(new42, pomn, by = "account_id")
+
+#+transactions
+tr=read.csv("data/A4/transactions.csv")
+cc=sqldf("select count(id) as cc_payments, account_id from tr where type='credit' group by account_id")
+new6=left_join(new5, cc, by = "account_id")
+balance=sqldf("select max(balance) as max_balance,min(balance) as min_balance,account_id from tr group by account_id")
+NEW=left_join(new6, balance, by = "account_id")
+
+NEW$open_date=as.Date(NEW$open_date,format='%Y-%m-%d') 
+NEW$account_id=as.factor(NEW$account_id) 
+write.csv(NEW,file='data/A4/customers_r.csv',row.names = FALSE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+NEW=read.csv('data/A4/customers_r.csv')
+DT::datatable(NEW, options = list(
+  pageLength = 5
+))
+```
+

@@ -1,0 +1,45 @@
+---
+title: "A3"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    html_document:
+      theme: readable
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Assignment 3
+
+**Make It Ugly, Then Make It Better**
+
+Using the same dataset you used in A1:
+
+1. Visualize the data and make it as ugly as you can. Seriously. Really ugly it up. Disregard readability, clarity, and understanding. Maybe make it misleading. Go to town. How ugly can you go?
+
+2. Edit your ugly chart to make it readable.
+
+3. Change the aesthetic to make the readable chart look like it belongs in one of Nicholas Felton (Links to an external site.)’s reports.
+
+4. Change the aesthetic to make the readable chart look like it came from a news publication.
+
+5. Change the aesthetic to make the readable chart look like it belongs in an art gallery.
+
+6. If you’re feeling bold, try visualizing the data in a medium you’re not used to.
+
+Just like in A1, please hand-draw these and upload scans or photos as your submission.
+
+Row
+-----------------------------------------------------------------------
+
+### Solution 3
+
+```{r}
+knitr::include_graphics("img/a3.png")
+```

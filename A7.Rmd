@@ -1,0 +1,88 @@
+---
+title: "A7"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyr)   # Data reshaping
+library(dplyr)   # Data manipulation
+library(ggplot2) # Graphs
+require(downloader)  
+library(dplyr)
+library(sqldf)
+library(reshape)
+library(stringr)
+library(tidyverse)
+library(xlsx)
+library(data.table)
+library(tibble)
+library(circlize)
+```
+
+Row
+-------------------------------
+
+### Asignment 7
+
+In this assignment you will visualize the flow of people between different states in the United States over the period of one year, using network graphs.
+
+You are required to choose New York, Texas and two other states as the origin states (where people lived the previous year) for this visualization, and show graphically the relative numbers of people that moved to the top 10 destination states (current state, in the data set) from each of the origin states. You are expected to create a single graphic for this project. For clarity, for each origin state, you will find the top 10 states that people moved to from that state in the year in question, and the union of those states will be represented as nodes in the graph. You will not consider migrations to other countries or US Territories (Puerto Rico, Guam and others), but only consider migrations to the 50 states and District of Columbia.
+
+```{r include=FALSE}
+m=readxl::read_excel("data/A7/State_to_State_Migrations_Table_2018.xls",skip = 4,col_names = FALSE) 
+
+m=m[1:73,]
+m=subset(m,select=-c(...2,...4,...6,...8))
+#m1<-m[!(m$...1=="United States2"),]
+m1=m[which((m[3,] != "MOE"))]
+m2=m1[6:73,]
+m2=drop_na(m2)
+m3<-m2[!(m2$...10=="Estimate")&!(m2$...10=="Alabama"),]
+#get state name
+state =data.frame( m   %>% .$...1 %>%as.vector)
+state=drop_na(state)
+state=data.frame(state[3:55 ,])
+#which(state=="Current residence in")
+state=data.frame(state[-28,])
+colnames(state)<-"state"
+state=state[1:51,]
+#remove other countries or US Territories
+m3=subset(m3,select=-c(...123,...125,...127,...129))
+m3=m3[1:51,]
+
+mdf=copy(m3)
+as.character(state)
+new_names <- as.character(state)
+mdf %>%
+  setnames(new_names)
+row.names(mdf)<-new_names
+#reconstruct dataframe
+mdf2 = data.frame(reshape2::melt(as.matrix(mdf), value.name = "count", varnames=c('target', 'source')))
+mdf2[mdf2 == "N/A"] = 0
+mdf2$count = as.numeric(as.character(mdf2$count))
+
+mdf3 = mdf2[mdf2$source %in% c("New York","Texas","California","Arizona"),]
+
+mdf4 = tibble::as_tibble(mdf3) %>%group_by(source) %>% arrange(count, .by_group = TRUE) %>%top_n(10)
+mdf4$target = state.abb[match(mdf4$target, state.name)]
+mdf4$source = state.abb[match(mdf4$source, state.name)]
+mdf4 = mdf4[,c("source","target","count")]
+
+```
+
+Row
+---------------------------------------
+
+### Solution 7
+
+```{r fig.height=10, fig.width=10,warning=FALSE}
+
+circos.clear()
+chordDiagram(mdf4,  annotationTrack = c("name", "grid"),
+             annotationTrackHeight = c(0.03, 0.01),transparency = 0.1,big.gap = 1)
+title("Migrations Network of \n New York, Texas, California and 		Arizona", cex = 0.8)
+```
