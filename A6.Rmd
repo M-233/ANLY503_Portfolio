@@ -53,7 +53,7 @@ Row
 Row {.tabset .tabset-fade}
 -------------------------------------
 
-```{r include=FALSE}
+```{r eval=FALSE, include=FALSE}
 US <- st_read("data/A6/tl_2019_us_county-1/tl_2019_us_county.shp")
 all=read.csv("data/A6/all.csv")
 all$GEOID=formatC(all$GEOID, width=5, flag="0")
@@ -398,6 +398,8 @@ tm_shape(cbp) +
 ```{r}
 knitr::include_graphics("img/pv12.png")
 ```
+
+
 ### PA_Democrat_16
 
 ```{r eval=FALSE, include=FALSE}
