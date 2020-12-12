@@ -20,7 +20,7 @@ navbar:
     - text: "A7"
       href: A7.html
     - text: "Project"
-      href: Project.html
+      href: https://m-233.github.io/ANLY503_Project/
       
 output:
   html_document:
