@@ -4,6 +4,8 @@ title: "Intro"
 
 The website contains all the assignments and project of ANLY 503 Analytical Data Visualization.Fall2020 Course. Unlike regular submitted assignments, codes are hidden and only plots and comments are shown in this website, to give more concise visualizations.
 
+The repository link is https://github.com/M-233/ANLY503_Portfolio/.
+
 ## About Course
 
 Data visualization is both art and science. More and more, the products of statistical analysis that we encounter in our everyday lives come in the form of data visualizations. Visualizations have the advantage of being easier to interpret for many people, but they also give the impression of being a form of absolute truth. As with any presentation method, though, visualizations can be manipulated by their creators to show the story they are trying to tell. In this class, we will explore the many methods of information visualization, and develop intuition for when data graphics are not telling the truth.

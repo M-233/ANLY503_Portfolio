@@ -10,4 +10,409 @@ output:
 library(flexdashboard)
 ```
 
+```{r include=FALSE}
+library(tidyr)   # Data reshaping
+library(dplyr)   # Data manipulation
+library(ggplot2) # Graphs
+require(downloader)  
+library(dplyr)
+library(sqldf)
+library(reshape)
+library(stringr)
+library(tidyverse)
+library(xlsx)
+
+#library(sf)
+library(spData)
+library(rgdal)
+library(maps)
+library(maptools) 
+library(tmap) 
+library(choroplethrMaps)
+#library(choroplethr)
+library(sf)
+```
+
+Row
+-------------------------------------
+
+### ss {.no-title}
+
+Since the shape files are over 100M and fail to git into github, I have to use screenshots instead.
+
+
+Row
+-------------------------------------
+
+### ss {.no-title}
+
+**Texas Unemployment Rate and Vote Percentage**
+
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+```{r include=FALSE}
+US <- st_read("data/A6/tl_2019_us_county-1/tl_2019_us_county.shp")
+all=read.csv("data/A6/all.csv")
+all$GEOID=formatC(all$GEOID, width=5, flag="0")
+
+allt=all %>% filter(state== "Texas")
+allc=all%>%filter(state=="California")
+allp=all%>%filter(state=="Pennsylvania")
+
+cbt=merge(US,allt,by="GEOID")
+cbc=merge(US,allc,by="GEOID")
+cbp=merge(US,allp,by="GEOID")
+```
+
+
+
+### TX_Unemployment_08
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "Unemployment_rate_2008",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Texas Unemployment rate of 2008 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/te08.png")
+```
+
+### TX_Unemployment_12
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "Unemployment_rate_2012",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Texas Unemployment rate of 2012 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/te12.png")
+```
+
+
+### TX_Unemployment_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "Unemployment_rate_2016",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Texas Unemployment rate of 2016 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/te16.png")
+```
+
+### TX_Democrat_08
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "voterate_2008",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Texas Vote rate of Democrat Candidate Obama in 2008 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/tv08.png")
+```
+
+### TX_Democrat_12
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "voterate_2012",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Texas Vote rate of Democrat Candidate Obama in 2012 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/tv12.png")
+```
+
+### TX_Democrat_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbt) + 
+  tm_polygons(col = "voterate_2016",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Texas Vote rate of Democrat Candidate Obama in 2016 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/tv16.png")
+```
+
+Row
+-------------------------------------
+
+### ss {.no-title}
+
+**California Unemployment Rate and Vote Percentage**
+
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### CA_Unemployment_08
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "Unemployment_rate_2008",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='California Unemployment rate of 2008 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/ce08.png")
+```
+
+
+### CA_Unemployment_12
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "Unemployment_rate_2012",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='California Unemployment rate of 2012 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/ce12.png")
+```
+
+
+### CA_Unemployment_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "Unemployment_rate_2016",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='California Unemployment rate of 2016 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/ce16.png")
+```
+
+### CA_Democrat_08
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "voterate_2008",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='California Vote rate of Democrat Candidate Obama in 2008 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/cv08.png")
+```
+
+### CA_Democrat_12
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "voterate_2012",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='California Vote rate of Democrat Candidate Obama in 2012 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/cv12.png")
+```
+
+### CA_Democrat_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbc) + 
+  tm_polygons(col = "voterate_2016",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='California Vote rate of Democrat Candidate Obama in 2016 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/cv16.png")
+```
+
+Row
+-------------------------------------
+
+### ss {.no-title}
+
+**Pennsylvania Unemployment Rate and Vote Percentage**
+
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### PA_Unemployment_08
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "Unemployment_rate_2008",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Pennsylvania Unemployment rate of 2008 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pe08.png")
+```
+
+
+### PA_Unemployment_12
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "Unemployment_rate_2012",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Pennsylvania Unemployment rate of 2012 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pe12.png")
+```
+
+
+### PA_Unemployment_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "Unemployment_rate_2016",
+              border.col = "black", border.alpha = .5,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0.0, 12.0, by=2), Inf),
+              palette='YlOrBr', 
+              title='Pennsylvania Unemployment rate of 2016 (%)',
+              popup.vars = c("County: "="county","Unemployment rate: "="Unemployment_rate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pe16.png")
+```
+
+### PA_Democrat_08
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "voterate_2008",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Pennsylvania Vote rate of Democrat Candidate Obama in 2008 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2008"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pv8.png")
+```
+
+
+### PA_Democrat_12
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "voterate_2012",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Pennsylvania Vote rate of Democrat Candidate Obama in 2012 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2012"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pv12.png")
+```
+### PA_Democrat_16
+
+```{r eval=FALSE, include=FALSE}
+tmap_mode('view')
+tm_shape(cbp) + 
+  tm_polygons(col = "voterate_2016",
+              border.col = "black", border.alpha = .3,
+              #style='jenks',
+              style='fixed',
+              breaks=c(seq(0, 100, by=5)),
+              palette='Reds', 
+              title='Pennsylvania Vote rate of Democrat Candidate Obama in 2016 (%)',
+              popup.vars = c("County: "="county", "Vote rate of Democrat: "="voterate_2016"), id='county')
+```
+```{r}
+knitr::include_graphics("img/pv16.png")
+```
 
