@@ -4,7 +4,20 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: scroll
+    theme: readable
+    header-includes:
+    - \usepackage{setspace}\doublespacing
+    - \usepackage{float}
 ---
+
+<style type="text/css">
+
+.chart-title {  /* chart_title  */
+   font-size: 30px;
+   font-family: Arial;
+  font-
+</style>
+
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
@@ -40,11 +53,6 @@ Row
 
 Since the shape files are over 100M and fail to git into github, I have to use screenshots instead.
 
-
-Row
--------------------------------------
-
-### ss {.no-title}
 
 **Texas Unemployment Rate and Vote Percentage**
 

@@ -23,7 +23,7 @@ window.FlexDashboardComponents = [];
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -725,55 +725,29 @@ table.dataTable thead th {
 
 
 body {
-  padding-top: 60px;
+  padding-top: 75px;
 }
 
 .section.sidebar {
-  top: 51px;
-  background-color: rgba(39, 128, 227, 0.1);
+  top: 66px;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .value-box {
-  color: #f9f9f9;
+  color: inherit;
 }
 
 .bg-primary {
-  background-color: rgba(39, 128, 227, 0.7);
+  background-color: rgba(69, 130, 236, 0.4);
 }
 
 .storyboard-nav .sbframelist ul li.active {
-  background-color: rgba(39, 128, 227, 0.7);
+  background-color: rgba(69, 130, 236, 0.7);
 }
 
 .nav-tabs-custom > .nav-tabs > li.active {
-  border-top-color: rgba(39, 128, 227, 0.7);
+  border-top-color: rgba(69, 130, 236, 0.7);
 }
-
-.bg-info {
-  background-color: rgba(153, 84, 187, 0.7);
-}
-
-.bg-warning {
-  background-color: rgba(255, 117, 24, 0.7);
-}
-
-.bg-danger {
-  background-color: rgba(255, 0, 57, 0.7);
-}
-
-.bg-success {
-  background-color: rgba(63, 182, 24, 0.7);
-}
-
-.chart-title {
-  font-weight: 500;
-}
-
-.nav-tabs-custom > .nav-tabs > li > a,
-.nav-tabs-custom > .nav-tabs > li > a:active {
-  font-weight: 500;
-}
-
 </style>
 
 
@@ -2603,6 +2577,13 @@ window.FlexDashboardComponents.push({
 
 <div id="dashboard-container">
 
+<style type="text/css">
+
+.chart-title {  /* chart_title  */
+   font-size: 30px;
+   font-family: Arial;
+  font-
+</style>
 <div id="row" class="section level2">
 <h2>Row</h2>
 <div id="assignment-3" class="section level3">
@@ -2652,7 +2633,7 @@ $(document).ready(function () {
 <script type="text/javascript">
 $(document).ready(function () {
   FlexDashboard.init({
-    theme: "cosmo",
+    theme: "readable",
     fillPage: false,
     orientation: "rows",
     storyboard: false,
